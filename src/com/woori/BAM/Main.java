@@ -1,3 +1,4 @@
+
 package com.woori.BAM;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +8,7 @@ public class Main {
 		System.out.println("== 프로그램 시작 ==");
 		Scanner sc = new Scanner(System.in); 
        
-		int id = 1;
+		int lastArticleId = 1;  
 		List<Article> articles = new ArrayList<>();
 		
 		while (true) {
@@ -17,39 +18,72 @@ public class Main {
 			if (cmd.equals("exit")) {
 				break;
 			} 
+			
 			if (cmd.length() == 0) {
 				System.out.println("명령어를 입력해 주세요");
 				continue;
 			}
-			// List 메서드중 size() 이용 (Data 유무를 객체의 객수(크기)로 변환)
-			if (cmd.equals("article list")) {
+			if (cmd.equals("article write")) {
+		
+				System.out.printf("제목 : ");
+				String title = sc.nextLine().trim(); 
+				System.out.printf("내용 : ");
+				String body = sc.nextLine().trim(); 
+				
+				Article article = new Article(lastArticleId,title,body); 
+				articles.add(article); 
+				
+				System.out.println(lastArticleId +"번글이 생성되었습니다");
+				lastArticleId++;
+				
+			} else if(cmd.equals("article list")){
+
 				if (articles.size() == 0 ) {
 					System.out.println("존재하는 게시글이 없습니다");
 					continue;
 					
 				}
 				
-				// 배열 사용해서 get() 사용 ==> 객체를 리턴 받음  
 				System.out.printf("번호    |     제목\n");
 				for (int i = articles.size() -1 ; i >= 0; i--) {
-					// article은 articles.get() 을 통해 받은 객체를 재사용하기 위해 저장 용도로 사용됨 
 					Article article = articles.get(i);
 					System.out.printf("%d      |     %s\n", article.id, article.title);
-
 				}
 				
-			} else if(cmd.equals("article write")){
+			} else if (cmd.startsWith("article detail ")) { 
+				String[] cmdBits = cmd.split(" ");
 				
-				System.out.printf("제목 : ");
-				String title = sc.nextLine().trim(); 
-				System.out.printf("내용 : ");
-				String body = sc.nextLine().trim(); 
+				Article foundArticle = null;
 				
-				Article article = new Article(id,title,body); 
-				articles.add(article); 
+				//article detail 예외처리
+				int id = 0;
 				
-				System.out.println(id +"번글이 생성되었습니다");
-				id++;
+				try { // Exception 발생 할 예상 코드 블럭
+					 id = Integer.parseInt(cmdBits[2]); 
+				
+				} catch (NumberFormatException e) { // (예외타입 변수명)
+					System.out.println("정수를 입력하시길 바랍니다");
+					continue;  // 이하 실행이 안되도록 ==> while 작동
+				} catch (Exception e)	 {
+					// 그밖에 모든 Exception 처리한다
+				}
+				
+				for (Article article : articles) {
+					if (article.id == id) {  
+						foundArticle = article ;
+						break;
+					}
+				}
+				
+				if (foundArticle == null) {
+					System.out.println(id + "번 게시물이 존재하지 않습니다");
+					continue;     
+				}
+				
+				System.out.println("번호 : " + foundArticle.id);
+				System.out.println("날짜 : ~~~");
+				System.out.println("제목 : " + foundArticle.title);
+				System.out.println("내용 : " + foundArticle.body);
 				
 			}else {
 				System.out.println("존재하지 않는 명령어 입니다");
