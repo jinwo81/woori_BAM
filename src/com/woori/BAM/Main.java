@@ -5,10 +5,11 @@ import java.util.List;
 import java.util.Scanner;
 public class Main {
 	public static void main(String[] args) {
+		
 		System.out.println("== 프로그램 시작 ==");
 		Scanner sc = new Scanner(System.in); 
        
-		int lastArticleId = 1;  
+		int lastArticleId = 1;  //게시글 번호이니까...마지막게시글번호로 수정 
 		List<Article> articles = new ArrayList<>();
 		
 		while (true) {
@@ -18,11 +19,11 @@ public class Main {
 			if (cmd.equals("exit")) {
 				break;
 			} 
-			
 			if (cmd.length() == 0) {
 				System.out.println("명령어를 입력해 주세요");
 				continue;
 			}
+
 			if (cmd.equals("article write")) {
 		
 				System.out.printf("제목 : ");
@@ -30,7 +31,7 @@ public class Main {
 				System.out.printf("내용 : ");
 				String body = sc.nextLine().trim(); 
 				
-				Article article = new Article(lastArticleId,title,body); 
+				Article article = new Article(lastArticleId , title, body); 
 				articles.add(article); 
 				
 				System.out.println(lastArticleId +"번글이 생성되었습니다");
@@ -44,48 +45,117 @@ public class Main {
 					
 				}
 				
-				System.out.printf("번호    |     제목\n");
+				System.out.printf("번호    |     제목   |    내용\n");
 				for (int i = articles.size() -1 ; i >= 0; i--) {
 					Article article = articles.get(i);
-					System.out.printf("%d      |     %s\n", article.id, article.title);
+					System.out.printf("%d      |     %s   |   %s\n", article.id, article.title, article.body);
 				}
 				
 			} else if (cmd.startsWith("article detail ")) { 
-				String[] cmdBits = cmd.split(" ");
+				String[] cmdBits = cmd.split(" ");  
 				
-				Article foundArticle = null;
-				
-				//article detail 예외처리
 				int id = 0;
 				
-				try { // Exception 발생 할 예상 코드 블럭
-					 id = Integer.parseInt(cmdBits[2]); 
-				
-				} catch (NumberFormatException e) { // (예외타입 변수명)
-					System.out.println("정수를 입력하시길 바랍니다");
-					continue;  // 이하 실행이 안되도록 ==> while 작동
-				} catch (Exception e)	 {
-					// 그밖에 모든 Exception 처리한다
+				try {
+					id = Integer.parseInt(cmdBits[2]);  
+				} catch (NumberFormatException e) {
+					System.out.println("명령어가 올바르지 않습니다");
+					continue;
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
+
+				
+				Article foundArticle = null; 
 				
 				for (Article article : articles) {
-					if (article.id == id) {  
-						foundArticle = article ;
+					if (article.id == id) {
+						foundArticle = article;
 						break;
 					}
 				}
 				
-				if (foundArticle == null) {
+				if (foundArticle == null) { 
 					System.out.println(id + "번 게시물이 존재하지 않습니다");
-					continue;     
+					continue;
 				}
-				
+
 				System.out.println("번호 : " + foundArticle.id);
 				System.out.println("날짜 : ~~~");
 				System.out.println("제목 : " + foundArticle.title);
 				System.out.println("내용 : " + foundArticle.body);
+
+			} else if (cmd.startsWith("article delete ")) { 
+				String[] cmdBits = cmd.split(" ");  
 				
-			}else {
+				int id = 0;  
+				
+				try {
+					id = Integer.parseInt(cmdBits[2]);  
+				} catch (NumberFormatException e) {
+					System.out.println("명령어가 올바르지 않습니다");
+					continue;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				Article foundArticle = null;  
+				
+				for (Article article : articles) {
+					if (article.id == id) {
+						foundArticle = article; 
+						break;
+					}
+				}
+				
+				if (foundArticle == null) { 
+					System.out.println(id + "번 게시물이 존재하지 않습니다");
+					continue;
+				}
+				
+				articles.remove(foundArticle);   
+				
+				System.out.println(id + "번 게시물이 삭제 되었습니다");
+				
+			} else if (cmd.startsWith("article modify ")) { 
+				String[] cmdBits = cmd.split(" ");  
+				
+				int id = 0;  
+				
+				try {
+					id = Integer.parseInt(cmdBits[2]);  
+				} catch (NumberFormatException e) {
+					System.out.println("명령어가 올바르지 않습니다");
+					continue;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				Article foundArticle = null;  
+				
+				for (Article article : articles) {
+					if (article.id == id) {
+						foundArticle = article;   // 중요 ==> 주소 복사
+						break;
+					}
+				}
+				
+				if (foundArticle == null) { 
+					System.out.println(id + "번 게시물이 존재하지 않습니다");
+					continue;
+				}
+				
+				System.out.println("수정할 제목 :");
+				String title = sc.nextLine().trim();
+				System.out.println("수정할 내용 :");
+				String body = sc.nextLine().trim();
+				
+				foundArticle.title = title;  // 수정된 값을 객체에다 저장 => 수정				foundArticle.body = body;
+				
+				
+				System.out.println(id + "번 게시물이 수정 되었습니다");
+				
+			} else {
 				System.out.println("존재하지 않는 명령어 입니다");
 			}
 		}
